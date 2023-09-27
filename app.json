@@ -5,10 +5,40 @@
       "bundler": "metro"
     },
     "plugins": [
-      "expo-router"
-      
+      "expo-router",
+      [
+        "expo-av",
+        {
+          "microphonePermission": "Allow $(PRODUCT_NAME) to access your microphone."
+        }
+      ],
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow $(PRODUCT_NAME) to access your camera."
+        }
+      ]
     ],
     "name": "food-app",
-    "slug": "food-app"
+    "slug": "food-app",
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "3101f5cf-9325-4c24-810c-6f30ad1c01e1"
+      }
+    },
+    "android": {
+      "permissions": [
+        "android.permission.RECORD_AUDIO",
+        "android.permission.MODIFY_AUDIO_SETTINGS",
+        "android.permission.CAMERA"
+      ],
+      "package": "com.ivantom.foodapp"
+    },
+    "ios": {
+      "bundleIdentifier": "com.ivantom.foodapp"
+    }
   }
 }
