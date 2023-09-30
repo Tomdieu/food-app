@@ -10,12 +10,13 @@ const ChatDetail = () => {
   const { chats } = useChats();
   const { setOptions } = useNavigation();
   const [chat, setChat] = useState<Discussion>();
+  const [me,setMe]= useState()
 
   useEffect(() => {
     const chat = chats.find((chat) => chat.id === Number(id));
     setChat(chat);
-    setOptions({ headerTitle: getRandomUser(chat) });
-  }, []);
+    setOptions({ headerTitle: getRandomUser(chat).name });
+  }, [id]);
 
   return (
     <View style={styles.container}>
@@ -38,7 +39,7 @@ export default ChatDetail;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
+    padding: 0,
   },
   messageContainer: {
     marginBottom: 16,

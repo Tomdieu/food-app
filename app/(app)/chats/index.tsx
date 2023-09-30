@@ -7,14 +7,17 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import React from "react";
+import React, { useEffect } from "react";
 import { STATUS_BAR_HEIGHT, getRandomUser } from "../../../constants";
 import useChats from "../../../hooks/useChat";
 import Avatar from "../../../assets/avatar.png";
 import { router } from "expo-router";
 
 const ChatsScreen = () => {
-  const { chats } = useChats();
+  const { chats, loadChats } = useChats();
+  useEffect(() => {
+    loadChats();
+  }, []);
   return (
     <SafeAreaView style={{ flex: 1, marginTop: STATUS_BAR_HEIGHT }}>
       <Text

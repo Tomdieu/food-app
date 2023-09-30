@@ -56,6 +56,4 @@ const useChats = create<ChatState>((set) => ({
   },
 }));
 
-useChats.getState().loadChats();
-
 export default useChats;

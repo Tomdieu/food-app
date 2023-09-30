@@ -12,9 +12,7 @@ import {
 import useFoodStore, { Food } from "../../../hooks/useFood";
 import CustomButton from "../../../components/CustomButton";
 import { router } from "expo-router";
-import { AntDesign } from "@expo/vector-icons";
 import { STATUS_BAR_HEIGHT } from "../../../constants";
-import useAuth from "../../../hooks/useAuth";
 
 const FoodScreen = () => {
   const { foods, removeFood } = useFoodStore();
@@ -43,7 +41,7 @@ const FoodScreen = () => {
           />
         </View>
       </TouchableOpacity>
-      <TouchableOpacity
+      {/* <TouchableOpacity
         style={styles.removeButton}
         onPress={() => removeFood(item.id)}
       >
@@ -54,7 +52,7 @@ const FoodScreen = () => {
           style={{ fontWeight: "bold" }}
         />
         <Text style={styles.removeButtonText}>Remove</Text>
-      </TouchableOpacity>
+      </TouchableOpacity> */}
     </View>
   );
 
@@ -138,7 +136,7 @@ const styles = StyleSheet.create({
     color: "#fff",
     borderRadius: 20,
     textAlign: "center",
-    textAlignVertical: "center",
+    // : "center",
     marginBottom: 5,
   },
   removeButton: {

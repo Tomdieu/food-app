@@ -1,22 +1,20 @@
 import React, { useEffect } from "react";
-import { Redirect, Tabs, router } from "expo-router";
+import { Tabs, router } from "expo-router";
 
 import {
   AntDesign,
-  Feather,
   FontAwesome,
   MaterialIcons,
   Ionicons,
 } from "@expo/vector-icons";
 import useAuth from "../../hooks/useAuth";
-import Header from "../../components/Header";
 import { TouchableOpacity } from "react-native";
 
 export default function RootLayout() {
   const { loadUserFromStorage, isAuthenticated, logout, user } = useAuth();
   useEffect(() => {
     loadUserFromStorage();
-  });
+  }, []);
 
   return (
     <Tabs
@@ -33,6 +31,7 @@ export default function RootLayout() {
             <MaterialIcons name="logout" color={tintColor} size={30} />
           </TouchableOpacity>
         ),
+        tabBarHideOnKeyboard: true,
       }}
     >
       <Tabs.Screen

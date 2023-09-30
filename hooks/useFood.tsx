@@ -58,6 +58,6 @@ const useFoodStore = create<FoodStoreState>((set, get) => ({
   },
 }));
 
-useFoodStore.getState().loadFoods();
+// useFoodStore.getState().loadFoods();
 
 export default useFoodStore;

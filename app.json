@@ -1,6 +1,13 @@
 {
   "expo": {
     "scheme": "acme",
+    "userInterfaceStyle": "automatic",
+    "icon": "./assets/food-fruits.jpg",
+    "splash": {
+      "image": "./assets/food-fruits.jpg",
+      "resizeMode": "contain",
+      "backgroundColor": "#ECFDFF"
+    },
     "web": {
       "bundler": "metro"
     },

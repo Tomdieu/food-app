@@ -37,7 +37,7 @@ const FoodDetail = () => {
       {
         text: "Yes",
         onPress: () => {
-          removeFood(id);
+          removeFood(Number(id));
         },
       },
     ]);

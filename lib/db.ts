@@ -1,21 +1,18 @@
 import * as SQLite from "expo-sqlite";
+import * as FileSystem from "expo-file-system";
+import { Platform } from "react-native";
 
-export const db = SQLite.openDatabase("sqlite.db"); // Changed the database name
+export function openDatabase() {
+  if (Platform.OS === "web") {
+    return {
+      transaction: () => {
+        return {
+          executeSql: () => {},
+        };
+      },
+    };
+  }
 
-db.transaction((tx) => {
-  // Create the foods table
-  tx.executeSql(
-    "CREATE TABLE IF NOT EXISTS foods (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, calories INTEGER, description TEXT, image TEXT)"
-  );
-
-  // Create the ingredients table
-  tx.executeSql(
-    "CREATE TABLE IF NOT EXISTS ingredients (id INTEGER PRIMARY KEY AUTOINCREMENT, food_id INTEGER, ingredient_name TEXT)"
-  );
-
-  tx.executeSql(
-    "CREATE TABLE IF NOT EXISTS person (id INTEGER PRIMARY KEY AUTOINCREMENT, height REAL, weight REAL)"
-  );
-
-  tx.executeSql(`INSERT INTO foods(name,calories,description) VALUES ('koki',255,'zsasdas')`,())
-});
+  const db = SQLite.openDatabase(`database.db`);
+  return db;
+}

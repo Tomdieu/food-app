@@ -12,13 +12,13 @@ const ChatInputForm = () => {
   return (
     <View style={styles.container}>
       <View style={styles.iconContainer}>
-        <TouchableOpacity style={styles.iconButton}>
+        <TouchableOpacity style={{}}>
           <MaterialCommunityIcons name="file" size={24} color="#555" />
         </TouchableOpacity>
-        <TouchableOpacity style={styles.iconButton}>
+        <TouchableOpacity style={{}}>
           <MaterialCommunityIcons name="image" size={24} color="#555" />
         </TouchableOpacity>
-        <TouchableOpacity style={styles.iconButton}>
+        <TouchableOpacity style={{}}>
           <MaterialCommunityIcons name="video" size={24} color="#555" />
         </TouchableOpacity>
       </View>
@@ -43,8 +43,8 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: 16,
-    paddingVertical: 8,
+    paddingHorizontal: 0,
+    paddingVertical: 2,
     borderTopWidth: 1,
     borderColor: "#ccc",
   },
@@ -59,16 +59,19 @@ const styles = StyleSheet.create({
     flex: 1,
     borderWidth: 1,
     borderColor: "#ccc",
-    borderRadius: 24,
-    paddingHorizontal: 16,
+    borderRadius: 5,
+    paddingHorizontal: 8,
   },
   textInput: {
     fontSize: 16,
+    height: 50,
   },
   sendButton: {
     marginLeft: 8,
     backgroundColor: "#007AFF",
-    borderRadius: 16,
+    borderRadius: 2,
     padding: 8,
+    alignItems: "center",
+    justifyContent: "center",
   },
 });

@@ -1,36 +1,119 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   View,
   StyleSheet,
   Text,
-  ImageBackground,
   StatusBar,
+  SafeAreaView,
+  TextInput,
+  Alert,
 } from "react-native";
-import useFoodStore from "../hooks/useFood";
 import CustomButton from "../components/CustomButton";
-import { router } from "expo-router";
-import FoodAndFruits from "../assets/fruits.jpg";
+import { useRouter } from "expo-router";
+import { STATUS_BAR_HEIGHT } from "../constants";
+import usePersonStore from "../hooks/useApp";
+import { openDatabase } from "../lib/db";
+
+import { useProject } from "../hooks/useProject";
+
+const db = openDatabase()
 
 const App = () => {
-  const { foods } = useFoodStore();
+  const router = useRouter();
+  const [name, setName] = useState("");
+  const [password, setPassword] = useState("");
+  const { updatePerson, person, savePersonData } = usePersonStore();
+  const { setPerson } = useProject()
+
+  const handleLogin = () => {
+    const authenticatedPerson = {
+      name: name,
+      password: password,
+    };
+
+    if (!authenticatedPerson.name || !authenticatedPerson.password) {
+      return Alert.alert("Error", "Please fill all the login informations");
+    }
+
+    let insertId: number;
+
+    db.transaction((tx) => {
+      tx.executeSql(
+        "INSERT INTO Person (name, password) VALUES (?, ?)",
+        [name, password],
+        (txObj, result) => {
+          insertId = result.insertId;
+          console.log(result);
+
+          // Now that the INSERT is complete, query the newly inserted person in a separate transaction
+          db.transaction((tx2) => {
+            tx2.executeSql(
+              "SELECT * FROM Person WHERE id = ?",
+              [insertId],
+              (txObj2, { rows: { _array } }) => {
+                console.log(_array);
+                setPassword(_array[0]);
+              }
+            );
+          });
+        }
+      );
+
+    });
+
+    // Update the Person with the authenticated data
+    updatePerson(authenticatedPerson);
+    savePersonData();
+
+    router.push("/menu");
+  };
+
+  console.log(person.name);
+
   return (
-    <ImageBackground
-      source={FoodAndFruits}
-      style={styles.backgroundImage}
-      resizeMode="stretch"
+    <SafeAreaView
+      style={{ flex: 1, marginTop: STATUS_BAR_HEIGHT, paddingHorizontal: 3 }}
     >
       <StatusBar barStyle="light-content" />
-      <View style={styles.container}>
-        <View style={styles.textContainer}>
-          <Text style={styles.title}>Welcome To Food Agenda</Text>
-          <Text style={styles.subtitle}>Save the food you eat</Text>
-        </View>
-        <CustomButton
-          onPress={() => router.push("/food")}
-          title={"Get Started"}
-        />
+      <View>
+        <Text style={{ fontWeight: "900", fontSize: 30 }}>Food App</Text>
       </View>
-    </ImageBackground>
+      <View
+        style={{
+          flex: 1,
+          paddingVertical: 8,
+          justifyContent: "center",
+          paddingHorizontal: 8,
+        }}
+      >
+        <View style={{ justifyContent: "center", marginVertical: 8 }}>
+          <Text style={{ fontWeight: "800", fontSize: 30 }}>
+            Welcome To Food App
+          </Text>
+          <Text>Track and Control what you eat</Text>
+        </View>
+        <View style={styles.formContainer}>
+          <View style={styles.inputContainer}>
+            <Text style={styles.label}>Name</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Name"
+              onChangeText={(text) => setName(text)}
+            />
+          </View>
+          <View style={styles.inputContainer}>
+            <Text style={styles.label}>Password</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Password"
+              secureTextEntry
+              onChangeText={(text) => setPassword(text)}
+            />
+          </View>
+          <CustomButton title="Login" onPress={() => handleLogin()} />
+        </View>
+      </View>
+    </SafeAreaView>
   );
 };
 
@@ -65,6 +148,29 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "white",
     textAlign: "center",
+  },
+  formContainer: {
+    gap: 5,
+    padding: 8,
+    borderWidth: 1,
+    borderColor: "#ccc", // Add a border color
+    borderRadius: 10, // Add border radius for rounded corners
+  },
+  inputContainer: {
+    marginBottom: 15,
+  },
+  label: {
+    fontSize: 16,
+    marginBottom: 5,
+    color: "#333", // Add label text color
+  },
+  input: {
+    height: 40,
+    borderColor: "#aaa", // Add input border color
+    borderWidth: 1,
+    borderRadius: 5,
+    paddingLeft: 10,
+    backgroundColor: "white", // Add input background color
   },
 });
 
