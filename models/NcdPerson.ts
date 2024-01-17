@@ -21,7 +21,13 @@ export class NCDPerson {
               ncdPerson.personId = data["person_id"];
               return ncdPerson;
             });
+            console.info("NcdPerson object created")
             resolve(ncdPersons);
+          },
+          (txObj, error) => {
+            reject("Could Not create NCDPerson Object")
+            console.error("Error : ", error.message)
+            return false;
           }
         );
       });

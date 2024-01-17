@@ -10,6 +10,12 @@ export default function RootLayout() {
   useEffect(() => {
     if (Platform.OS === "android") {
       db.transaction((tx) => {
+
+        // tx.executeSql(`DROP TABLE IF EXISTS Person;`)
+        // tx.executeSql(`DROP TABLE IF EXISTS Food;`)
+        // tx.executeSql(`DROP TABLE IF EXISTS HealthStatus;`)
+        // tx.executeSql(`DROP TABLE IF EXISTS NCDPerson;`)
+
         // Create the Person table
 
         tx.executeSql(
@@ -37,9 +43,6 @@ export default function RootLayout() {
       });
     }
   }, []);
-
-  console.log(db); // Changed from console.error to console.log
-
   return (
     <AuthProvider>
       <Slot />

@@ -15,6 +15,7 @@ import usePersonStore from "../hooks/useApp";
 import { openDatabase } from "../lib/db";
 
 import { useProject } from "../hooks/useProject";
+import { PersonModel } from "../models/Person";
 
 const db = openDatabase()
 
@@ -43,7 +44,7 @@ const App = () => {
         [name, password],
         (txObj, result) => {
           insertId = result.insertId;
-          console.log(result);
+          // console.log(result);
 
           // Now that the INSERT is complete, query the newly inserted person in a separate transaction
           db.transaction((tx2) => {
@@ -53,6 +54,13 @@ const App = () => {
               (txObj2, { rows: { _array } }) => {
                 console.log(_array);
                 setPassword(_array[0]);
+                PersonModel.get(insertId).then(person => {
+                  console.log(person.name)
+                  setPerson(person);
+
+                }).catch((err) => {
+                  console.log("Error Occur : ", err)
+                })
               }
             );
           });

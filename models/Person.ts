@@ -1,4 +1,7 @@
 import { openDatabase } from "../lib/db";
+import { FoodModel } from "./Food";
+import { HealthStatus } from "./HealthStatus";
+import { NCDPerson } from "./NcdPerson";
 
 const db = openDatabase();
 
@@ -22,7 +25,6 @@ export class PersonModel {
               p.id = data["id"];
               p.name = data["name"];
               p.password = data["password"];
-
               resolve(p);
             }
           }
@@ -64,8 +66,8 @@ export class PersonModel {
             [this.name, this.password, this.id],
             (txObj, result) => {
               if (result.rowsAffected > 0) {
-                const p = PersonModel.get(result.insertId);
-                resolve(p);
+                // Updated successfully, resolve with this instance
+                resolve(this);
               } else {
                 reject(
                   new Error("No person with the given id found for update.")
@@ -104,7 +106,7 @@ export class PersonModel {
             [this.id],
             (txObj, result) => {
               if (result.rowsAffected > 0) {
-                resolve(true);
+                resolve(true); // Deletion successful
               } else {
                 reject(
                   new Error("No person with the given id found for deletion.")
@@ -148,23 +150,24 @@ export class PersonModel {
     });
   }
 
-  public static async delete(id: number): Promise<void> {
-    return new Promise((resolve, reject) => {
-      db.transaction((tx) => {
-        tx.executeSql(
-          "DELETE FROM Person WHERE id = ?",
-          [id],
-          (txObj, result) => {
-            if (result.rowsAffected > 0) {
-              resolve();
-            } else {
-              reject(
-                new Error("No person with the given id found for deletion.")
-              );
-            }
-          }
-        );
-      });
-    });
+  public getAllFoods() {
+    if (this.id) {
+      return FoodModel.getFoodsOfUser(this.id);
+    }
+    return [];
+  }
+
+  public getAllNcd() {
+    if (this.id) {
+      return NCDPerson.getNcdOfPerson(this.id);
+    }
+    return [];
+  }
+
+  public getAllHealthStatus() {
+    if (this.id) {
+      return HealthStatus.getHealthStatusOfPerson(this.id);
+    }
+    return [];
   }
 }

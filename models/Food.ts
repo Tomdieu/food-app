@@ -23,7 +23,13 @@ export class FoodModel {
               food.date = data["date"];
               return food;
             });
+
             resolve(foods);
+          }, (txObj, error) => {
+
+            reject("Could Not Retrieve Food ")
+            console.error("Food Could Not be retrieve " + error.message)
+            return false;
           }
         );
       });
@@ -51,7 +57,13 @@ export class FoodModel {
             food.name = name;
             food.personId = personId;
             food.date = date;
+            console.info("Food Created")
             resolve(food);
+          },
+          (txObj, error) => {
+            reject("Could Not create Person Object")
+            console.error("Error : ", error.message)
+            return false;
           }
         );
       });
@@ -67,6 +79,7 @@ export class FoodModel {
             [this.name, this.date, this.id],
             (txObj, result) => {
               if (result.rowsAffected > 0) {
+                console.info("Food Update")
                 resolve();
               } else {
                 reject(

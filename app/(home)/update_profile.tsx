@@ -5,26 +5,30 @@ import CustomButton from "../../components/CustomButton";
 import usePersonStore from "../../hooks/useApp";
 import { SelectList } from "react-native-dropdown-select-list";
 import { useRouter } from "expo-router";
+import { useProject } from "../../hooks/useProject";
+import { NCDPerson } from "../../models/NcdPerson";
 
 const UpdateProfileScreen = () => {
   const router = useRouter();
   const { person, updatePerson, savePersonData } = usePersonStore();
+  const { foodApp, addNcdPerson } = useProject()
   const [ncd, setNcd] = useState("");
   const [selected, setSelected] = React.useState("");
 
+  console.log("Food App State ", foodApp)
   const [personData, setPersonData] = useState({
-    name: person.name,
-    password: person.password,
+    name: foodApp.name,
+    password: foodApp.password,
     obese: false,
-    ncdPersons: person.ncdPersons,
+    ncdPersons: foodApp.ncdPerson,
   });
 
-  const data = [
-    { key: "1", value: "Malaria" },
-    { key: "2", value: "HIV" },
-    { key: "3", value: "Cholera" },
-    { key: "4", value: "Typhoid" },
-  ];
+  // const data = [
+  //   { key: "1", value: "Malaria" },
+  //   { key: "2", value: "HIV" },
+  //   { key: "3", value: "Cholera" },
+  //   { key: "4", value: "Typhoid" },
+  // ];
 
   const handleProfileUpdate = () => {
     updatePerson(personData);
@@ -34,10 +38,15 @@ const UpdateProfileScreen = () => {
 
   const addNcd = () => {
     if (ncd) {
-      setPersonData({
-        ...personData,
-        ncdPersons: [...personData.ncdPersons, { name: ncd }],
-      });
+      NCDPerson.create({ name: ncd, personId: foodApp.id }).then((_ncd) => {
+        addNcdPerson({ id: _ncd.id, name: _ncd.name, person_id: _ncd.personId });
+        setPersonData({
+          ...personData,
+          ncdPersons: [...personData.ncdPersons, { id: _ncd.id, name: _ncd.name, person_id: _ncd.personId }],
+        });
+      }).catch(error => {
+        console.log("Error : ", error)
+      })
       setNcd("");
     }
   };
@@ -80,11 +89,11 @@ const UpdateProfileScreen = () => {
         </View>
         <View style={styles.ncdContainer}>
           <Text style={styles.label}>Non-Communicable Disease</Text>
-          <SelectList
+          {/* <SelectList
             setSelected={(val) => setSelected(val)}
             data={data}
             save="value"
-          />
+          /> */}
           <View style={styles.ncdInputContainer}>
             <TextInput
               style={{ ...styles.ncdInput }}

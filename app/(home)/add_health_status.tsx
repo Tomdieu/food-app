@@ -1,10 +1,12 @@
-import { StyleSheet, Text, TextInput, View } from "react-native";
+import { ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
 import React, { useState } from "react";
 import Checkbox from "expo-checkbox";
 import CustomButton from "../../components/CustomButton";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import usePersonStore from "../../hooks/useApp";
 import { router } from "expo-router";
+import { useProject } from "../../hooks/useProject";
+import { HealthStatus } from "../../models/HealthStatus";
 
 const AddHealthStatusScreen = () => {
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
@@ -16,7 +18,8 @@ const AddHealthStatusScreen = () => {
     date: "",
   });
 
-  const { addHealthStatus, savePersonData } = usePersonStore();
+  const { addHealthStatus, foodApp } = useProject()
+
 
   const showDatePicker = () => {
     setDatePickerVisibility(true);
@@ -32,23 +35,27 @@ const AddHealthStatusScreen = () => {
   };
 
   const handleSave = () => {
-    addHealthStatus(healthFormData);
-    savePersonData();
+    HealthStatus.create({ feelingWell: healthFormData.feeling_well, weight: healthFormData.weight, height: healthFormData.height, date: healthFormData.date, personId: foodApp.id }).then(healthStatus => {
+
+      addHealthStatus({ person_id: foodApp.id, feeling_well: healthStatus.feelingWell, date: healthStatus.date, weight: healthStatus.weight, height: healthStatus.height });
+    }).catch(error => {
+      console.log("Error : ", error)
+    })
     router.back();
   };
 
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
       <Text style={styles.title}>Add Health Status</Text>
       <View style={styles.formContainer}>
         <View style={styles.inputContainer}>
           <Text style={styles.label}>Date</Text>
-          <Text>{healthFormData.date}</Text>
-          <CustomButton
-            title="Select Date"
-            onPress={showDatePicker}
-            style={styles.dateButton}
-          />
+          <TouchableOpacity onPress={showDatePicker}>
+            <View style={{ width: '100%', paddingHorizontal: 8, paddingVertical: 15, borderColor: "#ccc", borderWidth: 1, backgroundColor: "#ffff", borderRadius: 5 }}>
+              {healthFormData.date && <Text >{new Date(healthFormData.date).toDateString()}</Text>}
+            </View>
+          </TouchableOpacity>
+
           <DateTimePickerModal
             isVisible={isDatePickerVisible}
             mode="date"
@@ -64,7 +71,12 @@ const AddHealthStatusScreen = () => {
               setHealthFormData({ ...healthFormData, feeling_well: value })
             }
           />
-          <Text style={styles.checkboxLabel}>Feeling Well</Text>
+          <TouchableWithoutFeedback onPress={() => {
+            setHealthFormData({ ...healthFormData, feeling_well: !healthFormData.feeling_well })
+          }}>
+
+            <Text style={styles.checkboxLabel}>Feeling Well</Text>
+          </TouchableWithoutFeedback>
         </View>
         <View style={styles.inputContainer}>
           <Text style={styles.label}>Health Problem</Text>
@@ -78,7 +90,7 @@ const AddHealthStatusScreen = () => {
           />
         </View>
         <View style={styles.inputContainer}>
-          <Text style={styles.label}>Weight</Text>
+          <Text style={styles.label}>Weight (kg)</Text>
           <TextInput
             style={styles.input}
             placeholder="Weight"
@@ -90,7 +102,7 @@ const AddHealthStatusScreen = () => {
           />
         </View>
         <View style={styles.inputContainer}>
-          <Text style={styles.label}>Height</Text>
+          <Text style={styles.label}>Height (cm)</Text>
           <TextInput
             style={styles.input}
             placeholder="Height"
@@ -102,10 +114,10 @@ const AddHealthStatusScreen = () => {
           />
         </View>
         <View style={styles.buttonContainer}>
-          <CustomButton title="Save" onPress={() => handleSave()} />
+          <CustomButton title="Save" disabled={!healthFormData.date || !healthFormData.health_problem || !healthFormData.height || !healthFormData.weight} onPress={() => handleSave()} />
         </View>
       </View>
-    </View>
+    </ScrollView>
   );
 };
 

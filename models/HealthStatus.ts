@@ -27,9 +27,15 @@ export class HealthStatus {
               healthStatus.weight = data["weight"];
               healthStatus.height = data["height"];
               healthStatus.feelingWell = !!data["feeling_well"];
+
               return healthStatus;
             });
             resolve(healthStatuses);
+          }, (txObj, error) => {
+
+            reject("Could Not Retrieve Health status ")
+            console.error("Health Status Could Not be retrieve " + error.message)
+            return false;
           }
         );
       });
@@ -63,7 +69,13 @@ export class HealthStatus {
             healthStatus.weight = weight;
             healthStatus.height = height;
             healthStatus.feelingWell = feelingWell;
+            console.info("Health Status Created")
             resolve(healthStatus);
+          }, (txObj, error) => {
+
+            reject("Could Not created Health status ")
+            console.error("Health Status Not Created " + error.message)
+            return false;
           }
         );
       });

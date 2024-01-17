@@ -1,20 +1,22 @@
-import { StyleSheet, Text, TextInput, View } from "react-native";
+import { StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import React, { useState } from "react";
 
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import CustomButton from "../../components/CustomButton";
 import usePersonStore from "../../hooks/useApp";
 import { router } from "expo-router";
+import { useProject } from "../../hooks/useProject";
+import { FoodModel } from "../../models/Food";
 
 const AddFoodScreen = () => {
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
+
+  const { foodApp, addFood } = useProject()
 
   const [foodData, setFoodData] = useState({
     name: "",
     date: "",
   });
-
-  const { addFood, savePersonData } = usePersonStore();
 
   const showDatePicker = () => {
     setDatePickerVisibility(true);
@@ -30,12 +32,14 @@ const AddFoodScreen = () => {
   };
 
   const handleAddFood = () => {
-    addFood(foodData);
-    savePersonData();
+    FoodModel.create({ personId: foodApp.id, name: foodData.name, date: foodData.date }).then((food) => {
+      addFood({ id: food.id, name: food.name, date: food.date, person_id: food.personId });
+    }).catch(error => {
+      console.log("Error : ", error)
+    })
     router.back();
   };
 
-  console.log(foodData.date);
 
   return (
     <View style={styles.container}>
@@ -52,12 +56,11 @@ const AddFoodScreen = () => {
         </View>
         <View style={styles.inputContainer}>
           <Text style={styles.label}>Date</Text>
-          {foodData.date && <Text>{foodData.date}</Text>}
-          <CustomButton
-            title="Select Date"
-            onPress={showDatePicker}
-            style={styles.dateButton}
-          />
+          <TouchableOpacity onPress={showDatePicker}>
+            <View style={{ width: '100%', paddingHorizontal: 8, paddingVertical: 15, borderColor: "#ccc", borderWidth: 1, backgroundColor: "#ffff", borderRadius: 5 }}>
+              {foodData.date && <Text >{new Date(foodData.date).toDateString()}</Text>}
+            </View>
+          </TouchableOpacity>
           <DateTimePickerModal
             isVisible={isDatePickerVisible}
             mode="date"

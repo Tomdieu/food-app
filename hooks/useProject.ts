@@ -1,4 +1,9 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { create } from "zustand";
+import { PersonModel } from "../models/Person";
+import { FoodModel } from "../models/Food";
+import { HealthStatus } from "../models/HealthStatus";
+import { NCDPerson } from "../models/NcdPerson";
 
 interface PersonState {
   id: number;
@@ -39,6 +44,7 @@ interface ProjectState {
 
 interface ProjectStore {
   foodApp: ProjectState;
+  getPerson: () => ProjectState;
   setPerson: (person: PersonState) => void;
   getFoods: () => FoodState[];
   getNdcPerson: () => NCDPersonState[];
@@ -62,14 +68,16 @@ const initialState: ProjectState = {
 
 export const useProject = create<ProjectStore>((set, get) => ({
   foodApp: initialState,
-  setPerson(person) {
+  async setPerson(person) {
     set((state) => ({
       foodApp: {
         ...state.foodApp,
         ...person,
       },
     }));
+    await AsyncStorage.setItem("userId", person.id.toString());
   },
+  getPerson: () => get().foodApp,
   getFoods: () => get().foodApp.foods,
   getNdcPerson: () => get().foodApp.ncdPerson,
   getHealthStatus: () => get().foodApp.healthStatus,
@@ -101,7 +109,66 @@ export const useProject = create<ProjectStore>((set, get) => ({
         name,
       },
     })),
-  loadData() {},
+  loadData() {
+    AsyncStorage.getItem("userId")
+      .then((id) => {
+        if (id) {
+          return Number(id);
+        } else {
+          return null;
+        }
+      })
+      .then((id) => {
+        if (id) {
+          return PersonModel.get(id);
+        } else {
+          return null;
+        }
+      })
+      .then((person) => {
+        if (person) {
+          set((state) => ({
+            foodApp: {
+              ...state.foodApp,
+              ...person,
+            },
+          }));
+
+          // load foods
+          FoodModel.getFoodsOfUser(person.id).then(food => {
+            const foods = food.map(_food => ({ id: _food.id, name: _food.name, person_id: _food.personId, date: _food.date }));
+            set((state) => ({
+              foodApp: {
+                ...state.foodApp,
+                foods: foods,
+              },
+            }));
+          })
+
+          // load health status
+          HealthStatus.getHealthStatusOfPerson(person.id).then(healthStatus => {
+            const healthStatuses = healthStatus.map(_healthStatus => ({ id: _healthStatus.id, person_id: _healthStatus.personId, date: _healthStatus.date, weight: _healthStatus.weight, height: _healthStatus.height, feeling_well: _healthStatus.feelingWell }));
+            set((state) => ({
+              foodApp: {
+                ...state.foodApp,
+                healthStatus: healthStatuses,
+              },
+            }));
+          })
+
+          // load ncd person
+          NCDPerson.getNcdOfPerson(person.id).then(ncdPerson => {
+            const ncdPersons = ncdPerson.map(_ncdPerson => ({ id: _ncdPerson.id, person_id: _ncdPerson.personId, name: _ncdPerson.name }));
+            set((state) => ({
+              foodApp: {
+                ...state.foodApp,
+                ncdPerson: ncdPersons,
+              },
+            }));
+          })
+        }
+      });
+  },
   updatePassword: (password) =>
     set((state) => ({
       foodApp: {

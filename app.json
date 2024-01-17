@@ -5,8 +5,8 @@
     "icon": "./assets/food-fruits.jpg",
     "splash": {
       "image": "./assets/food-fruits.jpg",
-      "resizeMode": "contain",
-      "backgroundColor": "#ECFDFF"
+      "resizeMode": "stretch",
+      "backgroundColor": "#D0C8C8"
     },
     "web": {
       "bundler": "metro"

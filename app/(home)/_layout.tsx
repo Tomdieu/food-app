@@ -3,8 +3,14 @@ import { SafeAreaView, Text, TouchableOpacity } from "react-native";
 import { StatusBar } from "react-native";
 import { STATUS_BAR_HEIGHT } from "../../constants";
 import { AntDesign } from "@expo/vector-icons";
+import { useProject } from "../../hooks/useProject";
+import { useEffect } from "react";
 
 export default function HomeLayout() {
+  const { loadData } = useProject()
+  useEffect(() => {
+    loadData()
+  }, [])
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <StatusBar barStyle="dark-content" />
